@@ -36,6 +36,7 @@
             <artifactId>spring-test</artifactId>
             <version>4.1.6.RELEASE</version>
         </dependency>
+
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>

@@ -1,10 +1,11 @@
 package com.shaunabram;
 
-import org.springframework.boot.*;
 import org.springframework.boot.autoconfigure.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
@@ -26,15 +27,17 @@ import java.util.concurrent.atomic.AtomicLong;
 @EnableAutoConfiguration
 public class GreetingController {
 
+	public static final String CLASSIC_GREETING_CONTENT = "Hello, World!";
+	public static final Integer CLASSIC_GREETING_ID = 1;
+	public static final Greeting CLASSIC_GREETING = new Greeting(CLASSIC_GREETING_ID, CLASSIC_GREETING_CONTENT);
+
 	private static final String template = "Hello, %s!";
 	private final AtomicLong counter = new AtomicLong();
-	public static final String CLASSIC_GREETING = "Hello, World!";
 
 	private List<Greeting> greetings = new ArrayList<>();
 
 	public GreetingController() {
-		Greeting g1 = new Greeting(1, CLASSIC_GREETING);
-		greetings.add(g1);
+		greetings.add(CLASSIC_GREETING);
 	}
 
 	@RequestMapping("/greeting")
@@ -47,6 +50,15 @@ public class GreetingController {
 	@RequestMapping(value ="/greetings",  method=RequestMethod.GET)
 	public @ResponseBody List<Greeting> greetings() {
 		return greetings;
+	}
+
+	@RequestMapping(value ="/greetings/{id}",  method=RequestMethod.GET)
+	public @ResponseBody Greeting greetings(@PathVariable("id") long id, HttpServletResponse servletResponse) {
+		for (Greeting greeting : greetings) {
+			if (greeting.getId() == id) return greeting;
+		}
+		servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+		return null;
 	}
 
 }
