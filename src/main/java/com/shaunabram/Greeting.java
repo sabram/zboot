@@ -43,4 +43,12 @@ public class Greeting {
 		result = 31 * result + (content != null ? content.hashCode() : 0);
 		return result;
 	}
+
+	@Override
+	public String toString() {
+		return "Greeting{" +
+				"id=" + id +
+				", content='" + content + '\'' +
+				'}';
+	}
 }
