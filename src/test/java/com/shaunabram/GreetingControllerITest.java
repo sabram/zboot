@@ -24,15 +24,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @WebIntegrationTest("server.port:9090")
 public class GreetingControllerITest {
 
-//	private final Condition<String> jedi = new Condition<String>("jedi") {
-//		private final Set<String> jedis = newLinkedHashSet("Luke", "Yoda", "Obiwan");
-//		@Override
-//		public boolean matches(String value) {
-//			return jedis.contains(value);
-//		}
-//	};
-
 	@Test
+	//Spring RestTemplate.getForObject doesn't play well with List return types
+	//http://stackoverflow.com/questions/8509060/how-do-i-avoid-compiler-warnings-when-generic-type-information-is-unavailable
 	@SuppressWarnings({"unchecked"})
 	public void greetings_returns_at_least_classicGreeting() {
 		RestTemplate restTemplate = new RestTemplate();
@@ -193,12 +187,12 @@ public class GreetingControllerITest {
 	}
 
 	@Test
-	public void put_greetings_with_missing_greeting_id_returns_BAD_REQUEST() {
+	public void put_greetings_with_missing_greeting_returns_BAD_REQUEST() {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("Accept", "application/json");
-		Integer anyId = 100;
 		HttpEntity<Greeting> entity = new HttpEntity<>(headers); //Note no greeting included
+		Integer anyId = 100;
 		String url = "http://localhost:9090/greetings/" + anyId;
 		HttpStatus statusCode = null;
 		try {
