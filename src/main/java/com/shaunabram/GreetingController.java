@@ -13,8 +13,8 @@ import java.util.concurrent.atomic.AtomicLong;
 /**
  * GET: 	localhost/greetings 	- return all greeting			[DONE]
  * GET:  	localhost/greetings/1 	- return greeting with id 1		[DONE]
- * PUT: 	localhost/greetings 	- unsupported. error? (code?)
- * PUT: 	localhost/greetings/1 	- update greeting with id 1
+ * PUT: 	localhost/greetings 	- unsupported. (400))			[DONE]
+ * PUT: 	localhost/greetings/1 	- update/create greeting 		[DONE]
  * POST:   	localhost/greetings 	- create greeting				[DONE]
  * POST:   	localhost/greetings/1 	- unsupported (400)				[DONE]
  * DELETE: 	localhost/greetings 	- unsupported (405)				[DONE]
@@ -22,6 +22,13 @@ import java.util.concurrent.atomic.AtomicLong;
  *
  * In future could support using Strings too
  * e.g. GET:  	localhost/greetings/World - return all greetings containing World
+ *
+ * Some points worth documenting:
+ * 1) Specifying response codes
+ * How to specify a response code? I am adding HttpServletResponse servletResponse as a param, then calling servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+ * I think there are other ways (better?)
+ *
+ *
  */
 @Controller
 @EnableAutoConfiguration
@@ -76,6 +83,29 @@ public class GreetingController {
 	public @ResponseBody Greeting postGreeting(@RequestParam(required=true) String content) {
 		Greeting greeting = new Greeting(counter.incrementAndGet(), content);
 		greetings.add(greeting);
+		return greeting;
+	}
+
+	@RequestMapping(value ="/greetings/{id}",  method=RequestMethod.PUT)
+	public @ResponseBody Greeting putGreeting(@PathVariable("id") long id, @RequestBody Greeting greeting, HttpServletResponse servletResponse) {
+		if (id != greeting.getId()) {
+			servletResponse.setStatus(HttpStatus.CONFLICT.value());
+			return greeting;
+		}
+		boolean updated = false;
+		for (int i=0; i<greetings.size(); i++) {
+			if (greetings.get(i).getId() == id) {
+				//existing greeting, updating
+				greetings.set(i, greeting);
+				updated = true;
+				break;
+			}
+		}
+		if (!updated) {
+			//new, creating
+			greetings.add(greeting);
+			servletResponse.setStatus(HttpStatus.CREATED.value());
+		}
 		return greeting;
 	}
 
