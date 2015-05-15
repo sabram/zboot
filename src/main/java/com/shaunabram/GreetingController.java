@@ -49,7 +49,7 @@ public class GreetingController {
 
 	@RequestMapping("/greeting")
 	public @ResponseBody Greeting greeting(
-			@RequestParam(value="name", required=false, defaultValue="World") String name) {
+			@RequestParam(value="content", required=false, defaultValue="World") String name) {
 		return new Greeting(counter.incrementAndGet(),
 				String.format(template, name));
 	}
