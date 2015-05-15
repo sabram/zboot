@@ -19,6 +19,29 @@ $(document).ready(function() {
             appendGreeting(greeting);
         });
     });
+
+    $('body').on('click', '.btn', function () {
+        var greetingId = $(this)
+            .closest("tr")
+            .find("td:first")
+            .text();
+        console.log("Deleting greetingId " + greetingId + "...");
+        $.ajax({
+            url: 'http://localhost:8080/greetings/' + greetingId,
+            type: "DELETE",
+            success:function(result) {
+                var rowId = "rowId" + greetingId;
+                $("#" + rowId).remove();
+                console.log('greeting deleted OK: ' + toString(result));
+            },
+            error:function(exception){
+                console.log("Problem deleting row\n" + toString(exception));
+            }
+        }).then(function(greeting) {
+            //appendGreeting(greeting);
+        });
+    });
+
 });
 
 function refreshGreetingsTable() {
@@ -32,9 +55,14 @@ function refreshGreetingsTable() {
 
 function appendGreeting(greeting) {
     $("#greetings").append(
-        "<tr>" +
-        "<td>" + greeting.id + "</td>" +
-        "<td>" + greeting.content + "</td>" +
+        "<tr id=rowId" + greeting.id + ">" +
+            "<td>" + greeting.id + "</td>" +
+            "<td>" + greeting.content + "</td>" +
+            "<td>" +
+                '<button id="deleteButton" type="button" class="btn btn-default" aria-label="Left Align">' +
+                    '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
+                '</button>' +
+            "</td>" +
         "</tr>");
 }
 
