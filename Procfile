@@ -1,0 +1,1 @@
+web: java -Dserver.port=$PORT -jar target/zboot-1.0-SNAPSHOT.war
