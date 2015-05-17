@@ -2,74 +2,13 @@ $(document).ready(function() {
 
     refreshGreetingsTable();
 
-    $('#submit').click( function() {
-        $.ajax({
-            url: 'http://localhost:8080/greetings/',
-            type: "POST",
-            contentType: 'application/x-www-form-urlencoded',
-            dataType: 'json',
-            data: $('form#formoid').serialize(),
-            success:function(result) {
-                console.log('form submitted OK: ' + toString(result));
-            },
-            error:function(exception){
-                console.log("Problem submitting form\n" + toString(exception));
-            }
-        }).then(function(greeting) {
-            appendGreeting(greeting);
-        });
-    });
+    onAddClick();
 
-    $('body').on('click', '#deleteButton', function () {
-        var greetingId = $(this)
-            .closest("tr")
-            .find("td:first")
-            .text();
-        console.log("Deleting greetingId " + greetingId + "...");
-        $.ajax({
-            url: 'http://localhost:8080/greetings/' + greetingId,
-            type: "DELETE",
-            success:function(result) {
-                var greetingRowId = "greetingRow" + greetingId;
-                $("#" + greetingRowId).remove();
-                console.log('greeting deleted OK: ' + toString(result));
-            },
-            error:function(exception){
-                console.log("Problem deleting row\n" + toString(exception));
-            }
-        }).then(function(greeting) {
-            //appendGreeting(greeting);
-        });
-    });
+    onDeleteClick();
 
-    $('body').on('click', '.editButton', function () {
-        var greetingId = $(this)
-            .closest("tr")
-            .find("td:first")
-            .text();
-        console.log("Edit button for " + greetingId + " clicked");
-        var myid = '#greeting' + greetingId + 'Content';
-        $(myid).attr("readonly", false);
-        $(myid).focus();
-        $('#greeting' + greetingId + 'EditBtn').prop('disabled', true);
-    });
+    onEditClick();
 
-    var i = 1;
-    $(".navnext").click( function() {
-        var maxIndex = $('#greetings tr').length - 1;
-        if (i > maxIndex) i=1;
-        var greetingContent = getGreetingAtRow(i);
-        $("#maintitle").text(greetingContent);
-        i++;
-    });
-
-    $(".navprev").click( function() {
-        var maxIndex = $('#greetings tr').length - 1;
-        if (i < 1) i=maxIndex;
-        var greetingContent = getGreetingAtRow(i);
-        $("#maintitle").text(greetingContent);
-        i--;
-    });
+    onNavigationClick();
 });
 
 function refreshGreetingsTable() {
@@ -78,8 +17,7 @@ function refreshGreetingsTable() {
             appendGreeting(greeting);
         });
     });
-    maxIndex = $('#greetings tr').length;
-    console.log("maxIndex = " + maxIndex);
+    maxIndex = $('#greetings').find('tr').length;
 }
 
 function appendGreeting(greeting) {
@@ -91,7 +29,7 @@ function appendGreeting(greeting) {
             "<td>" +
                 "<input id='" + greetingContentId + "' type='text' value='" + greeting.content + "' class='field left' readonly></td>" +
             "<td>" +
-                '<button id="deleteButton" type="button" class="btn btn-default" aria-label="Left Align">' +
+                '<button id="deleteBtn" type="button" class="btn btn-default" aria-label="Left Align">' +
                     '<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>' +
                 '</button>' +
             "</td>" +
@@ -108,17 +46,14 @@ function appendGreeting(greeting) {
             contentType: 'application/json',
             dataType: "json",
             data: formToJSON(greeting.id),
-            success:function(result) {
-                console.log('greeting updated OK: ' + toString(result));
+            success:function() {
+                $('#greeting' + greeting.id + 'EditBtn').prop('disabled', false);
+                var myid = '#greeting' + greeting.id + 'Content';
+                $(myid).attr("readonly", true);
             },
             error:function(exception){
                 console.log("Problem updating row\n" + toString(exception));
             }
-        }).then(function(greeting) {
-            //alert("rrr");
-            $('#greeting' + greeting.id + 'EditBtn').prop('disabled', false);
-            var myid = '#greeting' + greeting.id + 'Content';
-            $(myid).attr("readonly", true);
         });
     })
 }
@@ -131,7 +66,6 @@ function toString(exception) {
 
 // Helper function to serialize all the form fields into a JSON string
 function formToJSON(greetingID) {
-    //alert("formToJSON " + greetingID)
     return JSON.stringify({
         "id": $('#greetingID' + greetingID).text(),
         "content": $('#greeting' + greetingID + "Content").val()
@@ -140,6 +74,76 @@ function formToJSON(greetingID) {
 
 function getGreetingAtRow(row) {
     var greetingId = $('#greetings').find('tbody').find('tr:eq('+row+')').find('td:eq(0)').text();
-    var greetingContent = $("#greeting" + greetingId + "Content").val();
-    return greetingContent;
+    return $("#greeting" + greetingId + "Content").val();
+}
+
+function onAddClick() {
+    $('#addBtn').click(function () {
+        $.ajax({
+            url: 'http://localhost:8080/greetings/',
+            type: "POST",
+            contentType: 'application/x-www-form-urlencoded',
+            dataType: 'json',
+            data: $('form#greetingForm').serialize(),
+            success: function (greeting) {
+                appendGreeting(greeting);
+            },
+            error: function (exception) {
+                console.log("Problem submitting form\n" + toString(exception));
+            }
+        });
+    });
+}
+
+function onDeleteClick() {
+    $('body').on('click', '#deleteBtn', function () {
+        var greetingId = $(this)
+            .closest("tr")
+            .find("td:first")
+            .text();
+        $.ajax({
+            url: 'http://localhost:8080/greetings/' + greetingId,
+            type: "DELETE",
+            success: function (result) {
+                var greetingRowId = "greetingRow" + greetingId;
+                $("#" + greetingRowId).remove();
+                console.log('greeting deleted OK: ' + toString(result));
+            },
+            error: function (exception) {
+                console.log("Problem deleting row\n" + toString(exception));
+            }
+        });
+    });
+}
+
+function onEditClick() {
+    $('body').on('click', '.editButton', function () {
+        var greetingId = $(this)
+            .closest("tr")
+            .find("td:first")
+            .text();
+        var greetingContentID = '#greeting' + greetingId + 'Content';
+        $(greetingContentID).attr("readonly", false);
+        $(greetingContentID).focus();
+        $('#greeting' + greetingId + 'EditBtn').prop('disabled', true);
+    });
+}
+
+function onNavigationClick() {
+    var i = 1;
+    $(".navnext").click(function () {
+        var maxIndex = $('#greetings').find('tr').length - 1;
+        if (i > maxIndex) i = 1;
+        var greetingContent = getGreetingAtRow(i);
+        $("#maintitle").text(greetingContent);
+        i++;
+    });
+
+    $(".navprev").click(function () {
+        var maxIndex = $('#greetings').find('tr').length - 1;
+        if (i < 1) i = maxIndex;
+        var greetingContent = getGreetingAtRow(i);
+        $("#maintitle").text(greetingContent);
+        i--;
+    });
 }
