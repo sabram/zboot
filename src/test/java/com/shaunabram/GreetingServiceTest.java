@@ -42,8 +42,7 @@ public class GreetingServiceTest {
 	@Test
 	public void createGreeting() {
 		Greeting newGreeting = service.createGreeting(CLASSIC_GREETING_CONTENT);
-		assertThat(newGreeting).isNotNull();
-		assertThat(newGreeting.getId()).isNotNull();
-		assertThat(newGreeting.getContent()).isEqualTo(CLASSIC_GREETING_CONTENT);
+		Greeting returnedGreeting = service.getGreeting(newGreeting.getId());
+		assertThat(returnedGreeting).isEqualTo(newGreeting);
 	}
 }

@@ -37,6 +37,8 @@ public class GreetingService {
 	}
 
 	public Greeting createGreeting(String greetingContent) {
-		return new Greeting(counter.incrementAndGet(), greetingContent);
+		Greeting createdGreeting = new Greeting(counter.incrementAndGet(), greetingContent);
+		addGreeting(createdGreeting);
+		return createdGreeting;
 	}
 }
