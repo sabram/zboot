@@ -54,6 +54,25 @@ $(document).ready(function() {
         $('#greeting' + greetingId + 'EditBtn').prop('disabled', true);
     });
 
+    var i = 1;
+    var maxIndex = $('#greetings tr').length;
+
+    $(".navnext").click( function() {
+        var maxIndex = $('#greetings tr').length - 1;
+        console.log("maxIndex = " + maxIndex);
+        if (i > maxIndex) {
+            console.log("maxIndex of " + maxIndex + " reached");
+            i=1;
+        }
+        console.log(i);
+        var greetingId = $('#greetings').find('tbody').find('tr:eq('+i+')').find('td:eq(0)').text();
+        var greetingContent = $("#greeting" + greetingId + "Content").val();
+
+        console.log("greetingId = " + greetingId);
+        console.log("greetingContent = " + greetingContent);
+        $("#maintitle").text(greetingContent);
+        i++;
+    });
 });
 
 function refreshGreetingsTable() {
@@ -61,8 +80,9 @@ function refreshGreetingsTable() {
         $.each(data, function (i, greeting) {
             appendGreeting(greeting);
         });
-
     });
+    maxIndex = $('#greetings tr').length;
+    console.log("maxIndex = " + maxIndex);
 }
 
 function appendGreeting(greeting) {

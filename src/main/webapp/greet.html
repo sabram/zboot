@@ -51,10 +51,20 @@
 <div class="container">
 
     <div class="starter-template">
-        <h2>Greetings app</h2>
+        <h2>
+            <label id="maintitle">Greetings app</label>
+
+        </h2>
+        <div>
+        <span class="glyphicon glyphicon-chevron-left navprev" aria-hidden="true"></span>
+        Navigate greetings
+        <span class="glyphicon glyphicon-chevron-right navnext" aria-hidden="true"></span>
+        </div>
+
+        <br>
 
         <form id="formoid" >
-            <label for="content">Enter name:</label>
+            <label for="content" id="mylabel">Enter name:</label>
             <input id="content" type="text" name="content" value="World">
             <input type="button" value="Add" id="submit">
         </form>
@@ -62,10 +72,10 @@
 
         <table id="greetings" class="table table-bordered greetTable center">
             <tr>
-                <td><b>Greeting Id</b></td>
-                <td><b>Greeting Content</b></td>
-                <td><b>Delete</b></td>
-                <td><b>Edit</b></td>
+                <td>Greeting Id</td>
+                <td>Greeting Content</td>
+                <td>Delete</td>
+                <td>Edit</td>
             </tr>
         </table>
     </div>
