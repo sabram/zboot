@@ -55,23 +55,20 @@ $(document).ready(function() {
     });
 
     var i = 1;
-    var maxIndex = $('#greetings tr').length;
-
     $(".navnext").click( function() {
         var maxIndex = $('#greetings tr').length - 1;
-        console.log("maxIndex = " + maxIndex);
-        if (i > maxIndex) {
-            console.log("maxIndex of " + maxIndex + " reached");
-            i=1;
-        }
-        console.log(i);
-        var greetingId = $('#greetings').find('tbody').find('tr:eq('+i+')').find('td:eq(0)').text();
-        var greetingContent = $("#greeting" + greetingId + "Content").val();
-
-        console.log("greetingId = " + greetingId);
-        console.log("greetingContent = " + greetingContent);
+        if (i > maxIndex) i=1;
+        var greetingContent = getGreetingAtRow(i);
         $("#maintitle").text(greetingContent);
         i++;
+    });
+
+    $(".navprev").click( function() {
+        var maxIndex = $('#greetings tr').length - 1;
+        if (i < 1) i=maxIndex;
+        var greetingContent = getGreetingAtRow(i);
+        $("#maintitle").text(greetingContent);
+        i--;
     });
 });
 
@@ -139,4 +136,10 @@ function formToJSON(greetingID) {
         "id": $('#greetingID' + greetingID).text(),
         "content": $('#greeting' + greetingID + "Content").val()
     });
+}
+
+function getGreetingAtRow(row) {
+    var greetingId = $('#greetings').find('tbody').find('tr:eq('+row+')').find('td:eq(0)').text();
+    var greetingContent = $("#greeting" + greetingId + "Content").val();
+    return greetingContent;
 }
