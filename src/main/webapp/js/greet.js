@@ -1,4 +1,4 @@
-var baseUrl = "http://localhost:8080/greetings/";
+var baseUrl = "/greetings/";
 $(document).ready(function() {
 
     refreshGreetingsTable();
