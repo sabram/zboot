@@ -6,9 +6,7 @@ import org.springframework.stereotype.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * GET: 	localhost/greetings 	- return all greeting			[DONE]
@@ -34,76 +32,50 @@ import java.util.concurrent.atomic.AtomicLong;
 @EnableAutoConfiguration
 public class GreetingController {
 
-	public static final String CLASSIC_GREETING_CONTENT = "Hello, World!";
-	public static final Integer CLASSIC_GREETING_ID = 1;
-	public static final Greeting CLASSIC_GREETING = new Greeting(CLASSIC_GREETING_ID, CLASSIC_GREETING_CONTENT);
-
-	private static final String template = "Hello, %s!";
-	private final AtomicLong counter = new AtomicLong(CLASSIC_GREETING_ID);
-
-	private List<Greeting> greetings = new ArrayList<>();
-
-	public GreetingController() {
-		greetings.add(CLASSIC_GREETING);
-	}
-
-	@RequestMapping("/greeting")
-	public @ResponseBody Greeting greeting(
-			@RequestParam(value="content", required=false, defaultValue="World") String name) {
-		return new Greeting(counter.incrementAndGet(),
-				String.format(template, name));
-	}
+	private GreetingService service = new GreetingService();
 
 	@RequestMapping(value ="/greetings",  method=RequestMethod.GET)
 	public @ResponseBody List<Greeting> greetings() {
-		return greetings;
+		return service.getAllGreetings();
 	}
 
 	@RequestMapping(value ="/greetings/{id}",  method=RequestMethod.GET)
-	public @ResponseBody Greeting greetings(@PathVariable("id") long id, HttpServletResponse servletResponse) {
-		for (Greeting greeting : greetings) {
-			if (greeting.getId() == id) return greeting;
+	public @ResponseBody Greeting greetings(@PathVariable("id") int id, HttpServletResponse servletResponse) {
+		Greeting greeting = service.getGreeting(id);
+		if (greeting == null) {
+			servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
+			return null;
 		}
-		servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
-		return null;
+		return greeting;
 	}
 
 	@RequestMapping(value ="/greetings/{id}",  method=RequestMethod.DELETE)
-	public @ResponseBody void deleteGreeting(@PathVariable("id") long id, HttpServletResponse servletResponse) {
-		for (Greeting greeting : greetings) {
-			if (greeting.getId() == id) {
-				greetings.remove(greeting);
-				return;
-			}
+	public @ResponseBody void deleteGreeting(@PathVariable("id") int id, HttpServletResponse servletResponse) {
+		Greeting removedGreeting = service.removeGreeting(id);
+		if (removedGreeting == null) {
+			servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
 		}
-		servletResponse.setStatus(HttpStatus.NOT_FOUND.value());
 	}
 
 	@RequestMapping(value ="/greetings",  method=RequestMethod.POST)
 	public @ResponseBody Greeting postGreeting(@RequestParam(required=true) String content) {
-		Greeting greeting = new Greeting(counter.incrementAndGet(), content);
-		greetings.add(greeting);
-		return greeting;
+		return service.createGreeting(content);
 	}
 
 	@RequestMapping(value ="/greetings/{id}",  method=RequestMethod.PUT)
-	public @ResponseBody Greeting putGreeting(@PathVariable("id") long id, @RequestBody Greeting greeting, HttpServletResponse servletResponse) {
+	public @ResponseBody Greeting putGreeting(@PathVariable("id") int id, @RequestBody Greeting greeting, HttpServletResponse servletResponse) {
 		if (id != greeting.getId()) {
 			servletResponse.setStatus(HttpStatus.CONFLICT.value());
 			return greeting;
 		}
-		boolean updated = false;
-		for (int i=0; i<greetings.size(); i++) {
-			if (greetings.get(i).getId() == id) {
-				//existing greeting, updating
-				greetings.set(i, greeting);
-				updated = true;
-				break;
-			}
-		}
-		if (!updated) {
+		Greeting existingGreeting = service.getGreeting(id);
+		if (existingGreeting != null) {
+			//existing, updating
+			service.removeGreeting(id);
+			service.addGreeting(greeting);
+		} else {
 			//new, creating
-			greetings.add(greeting);
+			service.addGreeting(greeting);
 			servletResponse.setStatus(HttpStatus.CREATED.value());
 		}
 		return greeting;

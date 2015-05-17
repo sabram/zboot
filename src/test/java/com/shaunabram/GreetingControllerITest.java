@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.shaunabram.GreetingController.*;
+import static com.shaunabram.GreetingService.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
