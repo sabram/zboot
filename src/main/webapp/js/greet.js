@@ -10,6 +10,8 @@ $(document).ready(function() {
     onEditClick();
 
     onNavigationClick();
+
+
 });
 
 function refreshGreetingsTable() {
@@ -17,8 +19,13 @@ function refreshGreetingsTable() {
         $.each(data, function (i, greeting) {
             appendGreeting(greeting);
         });
+    }).done(function() {
+        displayInitialGreeting();
     });
-    maxIndex = $('#greetings').find('tr').length;
+}
+
+function displayInitialGreeting() {
+    $("#maintitle").text(getGreetingAtRow(1));
 }
 
 function appendGreeting(greeting) {
@@ -75,6 +82,7 @@ function formToJSON(greetingID) {
 
 function getGreetingAtRow(row) {
     var greetingId = $('#greetings').find('tbody').find('tr:eq('+row+')').find('td:eq(0)').text();
+    console.log("greetingId=" + greetingId);
     return $("#greeting" + greetingId + "Content").val();
 }
 
