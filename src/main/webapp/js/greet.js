@@ -1,3 +1,4 @@
+var baseUrl = "http://localhost:8080/greetings/";
 $(document).ready(function() {
 
     refreshGreetingsTable();
@@ -12,7 +13,7 @@ $(document).ready(function() {
 });
 
 function refreshGreetingsTable() {
-    $.get("http://localhost:8080/greetings", function (data) {
+    $.get(baseUrl, function (data) {
         $.each(data, function (i, greeting) {
             appendGreeting(greeting);
         });
@@ -41,7 +42,7 @@ function appendGreeting(greeting) {
         "</tr>");
     $("#" + greetingContentId).focusout(function() {
         $.ajax({
-            url: 'http://localhost:8080/greetings/' + greetingID,
+            url: baseUrl + greetingID,
             type: "PUT",
             contentType: 'application/json',
             dataType: "json",
@@ -80,7 +81,7 @@ function getGreetingAtRow(row) {
 function onAddClick() {
     $('#addBtn').click(function () {
         $.ajax({
-            url: 'http://localhost:8080/greetings/',
+            url: baseUrl,
             type: "POST",
             contentType: 'application/x-www-form-urlencoded',
             dataType: 'json',
@@ -102,7 +103,7 @@ function onDeleteClick() {
             .find("td:first")
             .text();
         $.ajax({
-            url: 'http://localhost:8080/greetings/' + greetingId,
+            url: baseUrl + greetingId,
             type: "DELETE",
             success: function (result) {
                 var greetingRowId = "greetingRow" + greetingId;
